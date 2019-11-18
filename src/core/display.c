@@ -715,6 +715,25 @@ meta_display_init_x11_finish (MetaDisplay   *display,
   return TRUE;
 }
 
+#ifdef HAVE_WAYLAND
+static void
+on_xserver_started (MetaXWaylandManager *manager,
+                    GAsyncResult        *result,
+                    gpointer             user_data)
+{
+  GTask *task = user_data;
+  GError *error = NULL;
+  gboolean retval;
+
+  retval = meta_xwayland_start_xserver_finish (manager, result, &error);
+
+  if (error)
+    g_task_return_error (task, error);
+  else
+    g_task_return_boolean (task, retval);
+}
+#endif
+
 void
 meta_display_init_x11 (MetaDisplay         *display,
                        GCancellable        *cancellable,
@@ -726,7 +745,22 @@ meta_display_init_x11 (MetaDisplay         *display,
   task = g_task_new (display, cancellable, callback, user_data);
   g_task_set_source_tag (task, meta_display_init_x11);
 
-  g_task_return_boolean (task, TRUE);
+#ifdef HAVE_WAYLAND
+  if (meta_is_wayland_compositor ())
+    {
+      MetaWaylandCompositor *compositor = meta_wayland_compositor_get_default ();
+
+      meta_xwayland_start_xserver (&compositor->xwayland_manager,
+                                   cancellable,
+                                   (GAsyncReadyCallback) on_xserver_started,
+                                   g_object_ref (task));
+    }
+  else
+#endif
+    {
+      g_task_return_boolean (task, TRUE);
+    }
+
   g_object_unref (task);
 }
 
@@ -856,7 +890,11 @@ meta_display_open (void)
   else
     {
       if (meta_get_x11_display_policy () == META_DISPLAY_POLICY_MANDATORY)
-        meta_display_init_x11 (display, NULL, on_x11_initialized, NULL);
+        {
+          meta_display_init_x11 (display, NULL,
+                                 (GAsyncReadyCallback) on_x11_initialized,
+                                 NULL);
+        }
       timestamp = meta_display_get_current_time_roundtrip (display);
     }
 
