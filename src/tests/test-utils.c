@@ -534,3 +534,20 @@ test_get_plugin_name (void)
   else
     return "libdefault";
 }
+
+void
+test_wait_for_x11_display (void)
+{
+  MetaDisplay *display;
+
+  display = meta_get_display ();
+  g_assert_nonnull (display);
+
+  if (display->x11_display)
+    return;
+
+  while (!display->x11_display)
+    g_main_context_iteration (NULL, TRUE);
+
+  g_assert_nonnull (display->x11_display);
+}

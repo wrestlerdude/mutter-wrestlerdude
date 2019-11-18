@@ -61,10 +61,19 @@ test_case_alarm_filter (MetaX11Display        *x11_display,
   return FALSE;
 }
 
+static void
+wait_for_x11_display (MetaDisplay *display)
+{
+  while (!display->x11_display)
+    g_main_context_iteration (NULL, TRUE);
+}
+
 static TestCase *
 test_case_new (void)
 {
   TestCase *test = g_new0 (TestCase, 1);
+
+  wait_for_x11_display (meta_get_display ());
 
   meta_x11_display_set_alarm_filter (meta_get_display ()->x11_display,
                                      test_case_alarm_filter, test);
