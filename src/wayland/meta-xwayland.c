@@ -593,6 +593,17 @@ xserver_finished_init (MetaXWaylandManager *manager)
   g_clear_pointer (&manager->init_loop, g_main_loop_unref);
 }
 
+static void
+on_init_x11_cb (MetaDisplay  *display,
+                GAsyncResult *result,
+                gpointer      user_data)
+{
+  g_autoptr (GError) error = NULL;
+
+  if (!meta_display_init_x11_finish (display, result, &error))
+    g_warning ("Failed to initialize X11 display: %s\n", error->message);
+}
+
 static gboolean
 on_displayfd_ready (int          fd,
                     GIOCondition condition,
@@ -608,7 +619,10 @@ on_displayfd_ready (int          fd,
   xserver_finished_init (manager);
 
   if (meta_get_x11_display_policy () == META_DISPLAY_POLICY_ON_DEMAND)
-    meta_display_init_x11 (display, NULL);
+    {
+      meta_display_init_x11 (display, NULL,
+                             (GAsyncReadyCallback) on_init_x11_cb, NULL);
+    }
 
   return G_SOURCE_REMOVE;
 }

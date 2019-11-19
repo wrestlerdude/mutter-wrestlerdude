@@ -657,13 +657,44 @@ on_ui_scaling_factor_changed (MetaSettings *settings,
   meta_display_reload_cursor (display);
 }
 
-gboolean
-meta_display_init_x11 (MetaDisplay  *display,
-                       GError      **error)
+static gboolean
+meta_display_init_x11_display (MetaDisplay  *display,
+                               GError      **error)
 {
   MetaX11Display *x11_display;
 
-  g_assert (display->x11_display == NULL);
+  x11_display = meta_x11_display_new (display, error);
+  if (!x11_display)
+    return FALSE;
+
+  display->x11_display = x11_display;
+  g_signal_emit (display, display_signals[X11_DISPLAY_SETUP], 0);
+
+  meta_x11_display_create_guard_window (x11_display);
+
+  if (!display->display_opening)
+    {
+      g_signal_emit (display, display_signals[X11_DISPLAY_OPENED], 0);
+      meta_display_manage_all_xwindows (display);
+      meta_compositor_redirect_x11_windows (display->compositor);
+    }
+
+  return TRUE;
+}
+
+gboolean
+meta_display_init_x11_finish (MetaDisplay   *display,
+                              GAsyncResult  *result,
+                              GError       **error)
+{
+  MetaX11Display *x11_display;
+
+  g_assert (g_task_get_source_tag (G_TASK (result)) == meta_display_init_x11);
+
+  if (!g_task_propagate_boolean (G_TASK (result), error))
+    return FALSE;
+  if (display->x11_display)
+    return TRUE;
 
   x11_display = meta_x11_display_new (display, error);
   if (!x11_display)
@@ -685,6 +716,21 @@ meta_display_init_x11 (MetaDisplay  *display,
 }
 
 void
+meta_display_init_x11 (MetaDisplay         *display,
+                       GCancellable        *cancellable,
+                       GAsyncReadyCallback  callback,
+                       gpointer             user_data)
+{
+  GTask *task;
+
+  task = g_task_new (display, cancellable, callback, user_data);
+  g_task_set_source_tag (task, meta_display_init_x11);
+
+  g_task_return_boolean (task, TRUE);
+  g_object_unref (task);
+}
+
+void
 meta_display_shutdown_x11 (MetaDisplay *display)
 {
   if (!display->x11_display)
@@ -693,6 +739,15 @@ meta_display_shutdown_x11 (MetaDisplay *display)
   g_signal_emit (display, display_signals[X11_DISPLAY_CLOSING], 0);
   g_object_run_dispose (G_OBJECT (display->x11_display));
   g_clear_object (&display->x11_display);
+}
+
+static void
+on_x11_initialized (MetaDisplay  *display,
+                    GAsyncResult *result,
+                    gpointer      user_data)
+{
+  if (!meta_display_init_x11_finish (display, result, NULL))
+    g_critical ("Failed to init X11 display");
 }
 
 /**
@@ -791,15 +846,17 @@ meta_display_open (void)
   display->selection = meta_selection_new (display);
   meta_clipboard_manager_init (display);
 
-  if (meta_get_x11_display_policy () == META_DISPLAY_POLICY_MANDATORY)
+  if (!meta_is_wayland_compositor () && META_IS_BACKEND_X11 (backend))
     {
-      if (!meta_display_init_x11 (display, &error))
-        g_error ("Failed to start Xwayland: %s", error->message);
+      if (!meta_display_init_x11_display (display, &error))
+        g_error ("Failed to init X11 display: %s", error->message);
 
       timestamp = display->x11_display->timestamp;
     }
   else
     {
+      if (meta_get_x11_display_policy () == META_DISPLAY_POLICY_MANDATORY)
+        meta_display_init_x11 (display, NULL, on_x11_initialized, NULL);
       timestamp = meta_display_get_current_time_roundtrip (display);
     }
 
