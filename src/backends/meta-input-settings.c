@@ -2024,8 +2024,15 @@ meta_input_settings_get_tablet_logical_monitor (MetaInputSettings  *settings,
   if (!info)
     return NULL;
 
-  meta_input_settings_find_monitor (settings, info->settings, device,
-                                    NULL, &logical_monitor);
+  logical_monitor =
+    meta_input_mapper_get_device_logical_monitor (priv->input_mapper, device);
+
+  if (!logical_monitor)
+    {
+      meta_input_settings_find_monitor (settings, info->settings, device,
+                                        NULL, &logical_monitor);
+    }
+
   return logical_monitor;
 }
 
