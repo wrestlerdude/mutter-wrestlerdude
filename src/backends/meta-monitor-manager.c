@@ -2621,6 +2621,7 @@ rebuild_monitors (MetaMonitorManager *manager)
 {
   GList *gpus;
   GList *l;
+  GList *specs;
 
   if (manager->monitors)
     {
@@ -2659,6 +2660,17 @@ rebuild_monitors (MetaMonitorManager *manager)
             }
         }
     }
+
+  specs = NULL;
+  for (l = manager->monitors; l; l = l->next)
+    {
+      specs = g_list_prepend (specs, meta_monitor_get_spec ((MetaMonitor*) l->data));
+    }
+
+  specs = g_list_sort (specs,
+                       (GCompareFunc) meta_monitor_spec_compare);
+  manager->edid_sufficient = meta_config_key_edid_sufficient_for_specs (specs);
+  g_list_free (specs);
 }
 
 void

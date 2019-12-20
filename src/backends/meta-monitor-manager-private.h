@@ -122,6 +122,7 @@ struct _MetaMonitorManager
   int screen_height;
 
   GList *monitors;
+  gboolean edid_sufficient;
 
   GList *logical_monitors;
   MetaLogicalMonitor *primary_logical_monitor;
