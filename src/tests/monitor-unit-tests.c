@@ -89,7 +89,8 @@
 typedef enum _MonitorTestFlag
 {
   MONITOR_TEST_FLAG_NONE,
-  MONITOR_TEST_FLAG_NO_STORED
+  MONITOR_TEST_FLAG_NO_STORED,
+  MONITOR_TEST_FLAG_OFFSET_DP_CONNECTOR,
 } MonitorTestFlag;
 
 typedef struct _MonitorTestCaseMode
@@ -923,6 +924,9 @@ create_monitor_test_setup (MonitorTestCase *test_case,
     hotplug_mode_update = TRUE;
   else
     hotplug_mode_update = FALSE;
+
+  if (flags & MONITOR_TEST_FLAG_OFFSET_DP_CONNECTOR)
+    n_normal_panels = 100;
 
   test_setup = g_new0 (MetaMonitorTestSetup, 1);
 
@@ -5275,6 +5279,15 @@ meta_test_monitor_custom_oneoff (void)
 
   test_setup = create_monitor_test_setup (&test_case,
                                           MONITOR_TEST_FLAG_NONE);
+  set_custom_monitor_config ("oneoff.xml");
+  emulate_hotplug (test_setup);
+
+  check_monitor_configuration (&test_case);
+
+  /* Same test after hotplugging the monitor to a different port */
+  test_setup = create_monitor_test_setup (&test_case,
+                                          MONITOR_TEST_FLAG_NONE |
+                                          MONITOR_TEST_FLAG_OFFSET_DP_CONNECTOR);
   set_custom_monitor_config ("oneoff.xml");
   emulate_hotplug (test_setup);
 
