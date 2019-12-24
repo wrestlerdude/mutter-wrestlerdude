@@ -2169,6 +2169,15 @@ process_locate_pointer_key (MetaDisplay     *display,
 {
   MetaKeyBindingManager *keys = &display->key_binding_manager;
 
+  if (display->focus_window)
+    {
+      ClutterInputDevice *source;
+
+      source = clutter_event_get_source_device ((ClutterEvent *) event);
+      if (meta_window_shortcuts_inhibited (display->focus_window, source))
+        return FALSE;
+    }
+
   return process_special_modifier_key (display,
                                        event,
                                        window,
@@ -2189,6 +2198,15 @@ process_iso_next_group (MetaDisplay *display,
 
   if (event->type == CLUTTER_KEY_RELEASE)
     return FALSE;
+
+  if (display->focus_window)
+    {
+      ClutterInputDevice *source;
+
+      source = clutter_event_get_source_device ((ClutterEvent *) event);
+      if (meta_window_shortcuts_inhibited (display->focus_window, source))
+        return FALSE;
+    }
 
   activate = FALSE;
   mask = mask_from_event_params (keys, event->modifier_state);
