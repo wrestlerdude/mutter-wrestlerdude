@@ -22,12 +22,16 @@
 
 #include "compositor/meta-compositor-native.h"
 
-#include "backends/meta-logical-monitor.h"
+#include "clutter/clutter.h"
+#include "backends/meta-output.h"
+#include "backends/native/meta-renderer-view-native.h"
 #include "compositor/meta-surface-actor-wayland.h"
 
 struct _MetaCompositorNative
 {
   MetaCompositorServer parent;
+
+  MetaSurfaceActor *frame_sync_surface_actor;
 };
 
 G_DEFINE_TYPE (MetaCompositorNative, meta_compositor_native,
@@ -115,16 +119,30 @@ maybe_assign_primary_plane (MetaCompositor *compositor)
   clutter_stage_view_assign_next_scanout (CLUTTER_STAGE_VIEW (view), scanout);
 }
 
+void
+meta_compositor_native_request_frame_sync (MetaCompositorNative *compositor_native,
+                                           MetaSurfaceActor     *surface_actor)
+{
+  compositor_native->frame_sync_surface_actor = surface_actor;
+}
+
 static void
 meta_compositor_native_before_paint (MetaCompositor   *compositor,
                                      ClutterStageView *stage_view)
 {
+  MetaCompositorNative *compositor_native = META_COMPOSITOR_NATIVE (compositor);
+  MetaRendererViewNative *view_native = META_RENDERER_VIEW_NATIVE (stage_view);
   MetaCompositorClass *parent_class;
 
   maybe_assign_primary_plane (compositor);
 
+  compositor_native->frame_sync_surface_actor = NULL;
+
   parent_class = META_COMPOSITOR_CLASS (meta_compositor_native_parent_class);
   parent_class->before_paint (compositor, stage_view);
+
+  meta_renderer_view_native_set_frame_sync_actor (view_native,
+                                                  CLUTTER_ACTOR (compositor_native->frame_sync_surface_actor));
 }
 
 MetaCompositorNative *

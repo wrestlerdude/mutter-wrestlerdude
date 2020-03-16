@@ -27,6 +27,9 @@
 G_DECLARE_FINAL_TYPE (MetaCompositorNative, meta_compositor_native,
                       META, COMPOSITOR_NATIVE, MetaCompositor)
 
+void meta_compositor_native_request_frame_sync (MetaCompositorNative *compositor_native,
+                                                MetaSurfaceActor     *surface_actor);
+
 MetaCompositorNative * meta_compositor_native_new (MetaDisplay *display,
                                                    MetaBackend *backend);
 
