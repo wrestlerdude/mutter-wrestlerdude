@@ -249,6 +249,36 @@ process_crtc_update (MetaKmsImplDevice  *impl_device,
   MetaKmsCrtcUpdate *crtc_update = update_entry;
   MetaKmsCrtc *crtc = crtc_update->crtc;
 
+  if (crtc_update->vrr_mode.has_update &&
+      crtc_update->vrr_mode.is_active)
+    {
+      meta_topic (META_DEBUG_KMS,
+                  "[atomic] Setting VRR mode on CRTC %u (%s)",
+                  meta_kms_crtc_get_id (crtc),
+                  meta_kms_impl_device_get_path (impl_device));
+
+      if (!add_crtc_property (impl_device,
+                              crtc, req,
+                              META_KMS_CRTC_PROP_VRR_ENABLED,
+                              1,
+                              error))
+        return FALSE;
+    }
+  else if (crtc_update->vrr_mode.has_update)
+    {
+      meta_topic (META_DEBUG_KMS,
+                  "[atomic] Unsetting VRR mode on CRTC %u (%s)",
+                  meta_kms_crtc_get_id (crtc),
+                  meta_kms_impl_device_get_path (impl_device));
+
+      if (!add_crtc_property (impl_device,
+                              crtc, req,
+                              META_KMS_CRTC_PROP_VRR_ENABLED,
+                              0,
+                              error))
+        return FALSE;
+    }
+
   return TRUE;
 }
 

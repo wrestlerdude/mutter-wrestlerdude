@@ -322,6 +322,11 @@ init_proporties (MetaKmsCrtc       *crtc,
           .name = "GAMMA_LUT",
           .type = DRM_MODE_PROP_BLOB,
         },
+      [META_KMS_CRTC_PROP_VRR_ENABLED] =
+        {
+          .name = "VRR_ENABLED",
+          .type = DRM_MODE_PROP_RANGE,
+        },
     }
   };
 
