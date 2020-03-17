@@ -550,6 +550,8 @@ struct _MetaWindow
   guint unmanage_idle_id;
 
   pid_t client_pid;
+
+  gboolean vrr_requested;
 };
 
 struct _MetaWindowClass
@@ -808,6 +810,12 @@ void meta_window_set_transient_for        (MetaWindow *window,
 
 void meta_window_set_opacity              (MetaWindow *window,
                                            guint8      opacity);
+
+void meta_window_set_vrr_requested (MetaWindow *window,
+                                    gboolean    vrr_requested);
+
+gboolean meta_window_vrr_requested (MetaWindow *window);
+
 
 void meta_window_handle_enter (MetaWindow  *window,
                                guint32      timestamp,
