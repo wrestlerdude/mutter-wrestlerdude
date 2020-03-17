@@ -92,6 +92,8 @@ typedef struct _MetaOutputInfo
   gboolean supports_underscanning;
   gboolean supports_color_transform;
 
+  gboolean vrr_capable;
+
   /*
    * Get a new preferred mode on hotplug events, to handle dynamic guest
    * resizing.
@@ -155,6 +157,13 @@ gboolean meta_output_is_presentation (MetaOutput *output);
 
 META_EXPORT_TEST
 gboolean meta_output_is_underscanning (MetaOutput *output);
+
+gboolean meta_output_is_vrr_enabled (MetaOutput *output);
+
+void meta_output_set_vrr_requested (MetaOutput *output,
+                                    int         vrr_requested);
+
+gboolean meta_output_is_vrr_requested (MetaOutput *output);
 
 void meta_output_set_backlight (MetaOutput *output,
                                 int         backlight);

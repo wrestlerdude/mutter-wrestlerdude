@@ -55,6 +55,9 @@ typedef struct _MetaOutputPrivate
 
   gboolean is_underscanning;
 
+  gboolean is_vrr_enabled;
+  gboolean is_vrr_requested;
+
   int backlight;
 } MetaOutputPrivate;
 
@@ -167,6 +170,31 @@ meta_output_is_underscanning (MetaOutput *output)
   return priv->is_underscanning;
 }
 
+gboolean
+meta_output_is_vrr_enabled (MetaOutput *output)
+{
+  MetaOutputPrivate *priv = meta_output_get_instance_private (output);
+
+  return priv->is_vrr_enabled;
+}
+
+void
+meta_output_set_vrr_requested (MetaOutput *output,
+                               int         vrr_requested)
+{
+  MetaOutputPrivate *priv = meta_output_get_instance_private (output);
+
+  priv->is_vrr_requested = vrr_requested;
+}
+
+gboolean
+meta_output_is_vrr_requested (MetaOutput *output)
+{
+  MetaOutputPrivate *priv = meta_output_get_instance_private (output);
+
+  return priv->is_vrr_requested;
+}
+
 void
 meta_output_set_backlight (MetaOutput *output,
                            int         backlight)
@@ -225,6 +253,7 @@ meta_output_assign_crtc (MetaOutput                 *output,
   priv->is_primary = output_assignment->is_primary;
   priv->is_presentation = output_assignment->is_presentation;
   priv->is_underscanning = output_assignment->is_underscanning;
+  priv->is_vrr_enabled = output_assignment->is_vrr_enabled;
 }
 
 void
@@ -414,6 +443,7 @@ meta_output_init (MetaOutput *output)
 {
   MetaOutputPrivate *priv = meta_output_get_instance_private (output);
 
+  priv->is_vrr_requested = FALSE;
   priv->backlight = -1;
 }
 

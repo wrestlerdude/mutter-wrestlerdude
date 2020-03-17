@@ -91,6 +91,7 @@ struct _MetaOutputAssignment
   gboolean     is_primary;
   gboolean     is_presentation;
   gboolean     is_underscanning;
+  gboolean     is_vrr_enabled;
 };
 
 /*
