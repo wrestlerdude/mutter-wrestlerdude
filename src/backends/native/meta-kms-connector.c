@@ -191,6 +191,9 @@ state_set_properties (MetaKmsConnectorState *state,
       else if ((prop->flags & DRM_MODE_PROP_RANGE) &&
                strcmp (prop->name, "non-desktop") == 0)
         state->non_desktop = drm_connector->prop_values[i];
+      else if ((prop->flags & DRM_MODE_PROP_RANGE) &&
+               strcmp (prop->name, "vrr_capable") == 0)
+        state->vrr_capable = drm_connector->prop_values[i];
 
       drmModeFreeProperty (prop);
     }
@@ -434,6 +437,7 @@ meta_kms_connector_state_new (void)
   state = g_new0 (MetaKmsConnectorState, 1);
   state->suggested_x = -1;
   state->suggested_y = -1;
+  state->vrr_capable = FALSE;
 
   return state;
 }
