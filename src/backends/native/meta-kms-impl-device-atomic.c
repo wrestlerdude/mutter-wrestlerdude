@@ -238,6 +238,21 @@ add_crtc_property (MetaKmsImplDevice  *impl_device,
 }
 
 static gboolean
+process_crtc_update (MetaKmsImplDevice  *impl_device,
+                     MetaKmsUpdate      *update,
+                     drmModeAtomicReq   *req,
+                     GArray             *blob_ids,
+                     gpointer            update_entry,
+                     gpointer            user_data,
+                     GError            **error)
+{
+  MetaKmsCrtcUpdate *crtc_update = update_entry;
+  MetaKmsCrtc *crtc = crtc_update->crtc;
+
+  return TRUE;
+}
+
+static gboolean
 process_mode_set (MetaKmsImplDevice  *impl_device,
                   MetaKmsUpdate      *update,
                   drmModeAtomicReq   *req,
@@ -896,6 +911,16 @@ meta_kms_impl_device_atomic_process_update (MetaKmsImplDevice *impl_device,
                         meta_kms_update_get_connector_updates (update),
                         NULL,
                         process_connector_update,
+                        &error))
+    goto err;
+
+  if (!process_entries (impl_device,
+                        update,
+                        req,
+                        blob_ids,
+                        meta_kms_update_get_crtc_updates (update),
+                        NULL,
+                        process_crtc_update,
                         &error))
     goto err;
 

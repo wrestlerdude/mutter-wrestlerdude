@@ -72,6 +72,12 @@ typedef struct _MetaKmsConnectorUpdate
   } underscanning;
 } MetaKmsConnectorUpdate;
 
+typedef struct _MetaKmsCrtcUpdate
+{
+  MetaKmsCrtc *crtc;
+
+} MetaKmsCrtcUpdate;
+
 typedef struct _MetaKmsPageFlipListener
 {
   MetaKmsCrtc *crtc;
@@ -127,6 +133,8 @@ GList * meta_kms_update_get_mode_sets (MetaKmsUpdate *update);
 GList * meta_kms_update_get_page_flip_listeners (MetaKmsUpdate *update);
 
 GList * meta_kms_update_get_connector_updates (MetaKmsUpdate *update);
+
+GList * meta_kms_update_get_crtc_updates (MetaKmsUpdate *update);
 
 GList * meta_kms_update_get_crtc_gammas (MetaKmsUpdate *update);
 
