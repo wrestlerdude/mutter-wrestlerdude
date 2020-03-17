@@ -348,6 +348,25 @@ meta_monitor_is_underscanning (MetaMonitor *monitor)
 }
 
 gboolean
+meta_monitor_is_vrr_capable (MetaMonitor *monitor)
+{
+  const MetaOutputInfo *output_info =
+    meta_monitor_get_main_output_info (monitor);
+
+  return output_info->vrr_capable;
+}
+
+gboolean
+meta_monitor_is_vrr_enabled (MetaMonitor *monitor)
+{
+  MetaOutput *output;
+
+  output = meta_monitor_get_main_output (monitor);
+
+  return meta_output_is_vrr_enabled (output);
+}
+
+gboolean
 meta_monitor_is_laptop_panel (MetaMonitor *monitor)
 {
   const MetaOutputInfo *output_info =
