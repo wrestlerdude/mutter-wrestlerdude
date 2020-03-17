@@ -3043,6 +3043,30 @@ meta_window_is_on_primary_monitor (MetaWindow *window)
   return window->monitor->is_primary;
 }
 
+/**
+ * meta_window_set_vrr_supported:
+ * @window: a #MetaWindow
+ * @vrr_supported: whether the window supports variable refresh rate
+ */
+void
+meta_window_set_vrr_supported (MetaWindow *window,
+                               gboolean    vrr_supported)
+{
+  window->vrr_supported = vrr_supported;
+}
+
+/**
+ * meta_window_get_vrr_supported:
+ * @window: a #MetaWindow
+ *
+ * Return value: %TRUE if the window supports variable refresh rate
+ */
+gboolean
+meta_window_get_vrr_supported (MetaWindow *window)
+{
+  return window->vrr_supported;
+}
+
 static void
 meta_window_get_tile_fraction (MetaWindow   *window,
                                MetaTileMode  tile_mode,
