@@ -100,9 +100,6 @@ G_DEFINE_TYPE_WITH_CODE (MetaRendererNative,
 static const CoglWinsysEGLVtable _cogl_winsys_egl_vtable;
 static const CoglWinsysVtable *parent_vtable;
 
-static void
-meta_renderer_native_queue_modes_reset (MetaRendererNative *renderer_native);
-
 const CoglWinsysVtable *
 meta_get_renderer_native_parent_vtable (void)
 {
@@ -830,7 +827,7 @@ _cogl_winsys_egl_vtable = {
   .context_init = meta_renderer_native_init_egl_context
 };
 
-static void
+void
 meta_renderer_native_queue_modes_reset (MetaRendererNative *renderer_native)
 {
   MetaRenderer *renderer = META_RENDERER (renderer_native);

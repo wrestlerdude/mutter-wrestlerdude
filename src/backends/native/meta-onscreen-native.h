@@ -33,6 +33,8 @@ G_DECLARE_FINAL_TYPE (MetaOnscreenNative, meta_onscreen_native,
                       META, ONSCREEN_NATIVE,
                       CoglOnscreenEgl)
 
+void meta_onscreen_native_queue_modeset (CoglOnscreen *onscreen);
+
 void meta_renderer_native_release_onscreen (CoglOnscreen *onscreen);
 
 void meta_onscreen_native_finish_frame (CoglOnscreen *onscreen,

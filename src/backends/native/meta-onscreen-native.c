@@ -391,6 +391,14 @@ custom_egl_stream_page_flip (gpointer custom_page_flip_data,
 #endif /* HAVE_EGL_DEVICE */
 
 void
+meta_onscreen_native_queue_modeset (CoglOnscreen *onscreen)
+{
+  MetaOnscreenNative *onscreen_native = META_ONSCREEN_NATIVE (onscreen);
+
+  meta_renderer_native_queue_modes_reset (onscreen_native->renderer_native);
+}
+
+void
 meta_onscreen_native_dummy_power_save_page_flip (CoglOnscreen *onscreen)
 {
   CoglFrameInfo *frame_info;

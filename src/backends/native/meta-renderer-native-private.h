@@ -84,6 +84,8 @@ MetaGles3 * meta_renderer_native_get_gles3 (MetaRendererNative *renderer_native)
 MetaRendererNativeGpuData * meta_renderer_native_get_gpu_data (MetaRendererNative *renderer_native,
                                                                MetaGpuKms         *gpu_kms);
 
+void meta_renderer_native_queue_modes_reset (MetaRendererNative *renderer_native);
+
 gboolean meta_renderer_native_has_pending_mode_sets (MetaRendererNative *renderer_native);
 
 gboolean meta_renderer_native_has_pending_mode_set (MetaRendererNative *renderer_native);
