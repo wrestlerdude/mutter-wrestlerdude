@@ -207,6 +207,20 @@ _clutter_stage_window_set_accept_focus (ClutterStageWindow *window,
     iface->set_accept_focus (window, accept_focus);
 }
 
+gboolean
+_clutter_stage_window_can_redraw (ClutterStageWindow *window)
+{
+  ClutterStageWindowInterface *iface;
+
+  g_return_val_if_fail (CLUTTER_IS_STAGE_WINDOW (window), FALSE);
+
+  iface = CLUTTER_STAGE_WINDOW_GET_IFACE (window);
+  if (iface->can_redraw)
+    return iface->can_redraw (window);
+
+  return FALSE;
+}
+
 void
 _clutter_stage_window_redraw (ClutterStageWindow *window)
 {
