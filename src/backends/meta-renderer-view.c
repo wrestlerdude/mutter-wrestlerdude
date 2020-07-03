@@ -33,6 +33,7 @@
 #include "backends/meta-renderer-view.h"
 
 #include "backends/meta-crtc.h"
+#include "backends/meta-output.h"
 #include "backends/meta-renderer.h"
 #include "clutter/clutter-mutter.h"
 #include "compositor/region-utils.h"
@@ -43,6 +44,7 @@ enum
 
   PROP_TRANSFORM,
   PROP_CRTC,
+  PROP_OUTPUT,
 
   PROP_LAST
 };
@@ -56,6 +58,7 @@ struct _MetaRendererView
   MetaMonitorTransform transform;
 
   MetaCrtc *crtc;
+  MetaOutput *output;
 };
 
 G_DEFINE_TYPE (MetaRendererView, meta_renderer_view,
@@ -71,6 +74,12 @@ MetaCrtc *
 meta_renderer_view_get_crtc (MetaRendererView *view)
 {
   return view->crtc;
+}
+
+MetaOutput *
+meta_renderer_view_get_output (MetaRendererView *view)
+{
+  return view->output;
 }
 
 static void
@@ -174,6 +183,9 @@ meta_renderer_view_get_property (GObject    *object,
     case PROP_CRTC:
       g_value_set_object (value, view->crtc);
       break;
+    case PROP_OUTPUT:
+      g_value_set_object (value, view->output);
+      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
       break;
@@ -195,6 +207,9 @@ meta_renderer_view_set_property (GObject      *object,
       break;
     case PROP_CRTC:
       view->crtc = g_value_get_object (value);
+      break;
+    case PROP_OUTPUT:
+      view->output = g_value_get_object (value);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -239,6 +254,15 @@ meta_renderer_view_class_init (MetaRendererViewClass *klass)
                          "MetaCrtc",
                          "MetaCrtc",
                          META_TYPE_CRTC,
+                         G_PARAM_READWRITE |
+                         G_PARAM_CONSTRUCT_ONLY |
+                         G_PARAM_STATIC_STRINGS);
+
+  obj_props[PROP_OUTPUT] =
+    g_param_spec_object ("output",
+                         "MetaOutput",
+                         "MetaOutput",
+                         META_TYPE_OUTPUT,
                          G_PARAM_READWRITE |
                          G_PARAM_CONSTRUCT_ONLY |
                          G_PARAM_STATIC_STRINGS);
