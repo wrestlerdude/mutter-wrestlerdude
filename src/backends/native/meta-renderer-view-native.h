@@ -31,4 +31,7 @@
 G_DECLARE_FINAL_TYPE (MetaRendererViewNative, meta_renderer_view_native,
                       META, RENDERER_VIEW_NATIVE, MetaRendererView)
 
+void meta_renderer_view_native_set_frame_sync_actor (MetaRendererViewNative *view_native,
+                                                     ClutterActor           *actor);
+
 #endif /* META_RENDERER_VIEW_NATIVE_H */
