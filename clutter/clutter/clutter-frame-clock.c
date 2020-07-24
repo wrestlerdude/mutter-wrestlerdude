@@ -164,11 +164,13 @@ maybe_reschedule_update (ClutterFrameClock *frame_clock)
 
       if (frame_clock->pending_reschedule_now)
         {
+          g_debug ("maybe_reschedule_update: %p: rescheduling now", frame_clock);
           frame_clock->pending_reschedule_now = FALSE;
           clutter_frame_clock_schedule_update_now (frame_clock);
         }
       else
         {
+          g_debug ("maybe_reschedule_update: %p: rescheduling", frame_clock);
           clutter_frame_clock_schedule_update (frame_clock);
         }
     }
@@ -179,6 +181,9 @@ clutter_frame_clock_notify_presented (ClutterFrameClock *frame_clock,
                                       ClutterFrameInfo  *frame_info)
 {
   int64_t presentation_time_us = frame_info->presentation_time;
+
+  g_debug ("clutter_frame_clock_notify_presented: %p: presentation_time_us: %" G_GINT64_FORMAT ", last_presentation_time_us: %" G_GINT64_FORMAT,
+            frame_clock, presentation_time_us, frame_clock->last_presentation_time_us);
 
   if (presentation_time_us > frame_clock->last_presentation_time_us ||
       ((presentation_time_us - frame_clock->last_presentation_time_us) >
@@ -220,6 +225,7 @@ clutter_frame_clock_inhibit (ClutterFrameClock *frame_clock)
         case CLUTTER_FRAME_CLOCK_STATE_IDLE:
           break;
         case CLUTTER_FRAME_CLOCK_STATE_SCHEDULED:
+          g_debug ("clutter_frame_clock_inhibit: %p: will reschedule", frame_clock);
           frame_clock->pending_reschedule = TRUE;
           frame_clock->state = CLUTTER_FRAME_CLOCK_STATE_IDLE;
           break;
@@ -246,8 +252,11 @@ clutter_frame_clock_uninhibit (ClutterFrameClock *frame_clock)
 void
 clutter_frame_clock_schedule_update_now (ClutterFrameClock *frame_clock)
 {
+  g_debug ("clutter_frame_clock_schedule_update_now called: %p", frame_clock);
+
   if (frame_clock->inhibit_count > 0)
     {
+      g_debug ("clutter_frame_clock_schedule_update_now: %p, inhibited, will reschedule", frame_clock);
       frame_clock->pending_reschedule = TRUE;
       frame_clock->pending_reschedule_now = TRUE;
       return;
@@ -261,10 +270,13 @@ clutter_frame_clock_schedule_update_now (ClutterFrameClock *frame_clock)
       return;
     case CLUTTER_FRAME_CLOCK_STATE_DISPATCHING:
     case CLUTTER_FRAME_CLOCK_STATE_PENDING_PRESENTED:
+      g_debug ("clutter_frame_clock_schedule_update_now: %p, dispatching or pending, will reschedule", frame_clock);
       frame_clock->pending_reschedule = TRUE;
       frame_clock->pending_reschedule_now = TRUE;
       return;
     }
+
+  g_debug ("clutter_frame_clock_schedule_update_now: %p: dispatching immediately", frame_clock);
 
   g_source_set_ready_time (frame_clock->source, g_get_monotonic_time ());
   frame_clock->last_expected_presentation_time_us = -1;
@@ -274,8 +286,11 @@ clutter_frame_clock_schedule_update_now (ClutterFrameClock *frame_clock)
 void
 clutter_frame_clock_schedule_update (ClutterFrameClock *frame_clock)
 {
+  g_debug ("clutter_frame_clock_schedule_update called: %p", frame_clock);
+
   if (frame_clock->inhibit_count > 0)
     {
+      g_debug ("clutter_frame_clock_schedule_update: %p, inhibited, will reschedule", frame_clock);
       frame_clock->pending_reschedule = TRUE;
       return;
     }
@@ -288,9 +303,14 @@ clutter_frame_clock_schedule_update (ClutterFrameClock *frame_clock)
       return;
     case CLUTTER_FRAME_CLOCK_STATE_DISPATCHING:
     case CLUTTER_FRAME_CLOCK_STATE_PENDING_PRESENTED:
+      g_debug ("clutter_frame_clock_schedule_update: %p, dispatching or pending, will reschedule", frame_clock);
       frame_clock->pending_reschedule = TRUE;
       return;
     }
+
+  g_debug ("clutter_frame_clock_schedule_update: %p: last_presentation_time_us: %" G_GINT64_FORMAT
+           ", last_expected_presentation_time_us: %" G_GINT64_FORMAT,
+           frame_clock, frame_clock->last_presentation_time_us, frame_clock->last_expected_presentation_time_us);
 
   clutter_clock_driver_schedule_tick (frame_clock->clock_driver,
                                       frame_clock->last_presentation_time_us,
@@ -307,6 +327,8 @@ frame_clock_tick (ClutterClockDriver *clock_driver,
   ClutterFrameClock *frame_clock = CLUTTER_FRAME_CLOCK (user_data);
   int64_t frame_count;
   ClutterFrameResult result;
+
+  g_debug ("frame_clock_tick: %p: time_us: %" G_GINT64_FORMAT, frame_clock, time_us);
 
   COGL_TRACE_BEGIN_SCOPED (ClutterFrameCLockDispatch, "Frame Clock (dispatch)");
 
@@ -355,6 +377,8 @@ frame_clock_tick (ClutterClockDriver *clock_driver,
         }
       break;
     }
+
+  g_debug ("frame_clock_tick: %p: done.", frame_clock);
 }
 
 static void

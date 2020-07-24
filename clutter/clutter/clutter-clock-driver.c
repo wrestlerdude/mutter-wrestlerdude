@@ -69,6 +69,8 @@ calculate_tick_start_time_us (ClutterClockDriver *clock_driver,
 
   target_interval_time_us = last_interval_time_us + interval_duration_us;
 
+  g_debug ("calculate_tick_start_time_us: %p, step 1, target_interval_time_us: %" G_GINT64_FORMAT, clock_driver, target_interval_time_us);
+
   /* Skip ahead to get close to the actual target interval time. */
   if (target_interval_time_us < now_us)
     {
@@ -81,6 +83,8 @@ calculate_tick_start_time_us (ClutterClockDriver *clock_driver,
       hw_clock_offset_us = last_interval_time_us % interval_duration_us;
 
       target_interval_time_us = logical_clock_phase_us + hw_clock_offset_us;
+
+      g_debug ("calculate_tick_start_time_us: %p, step 2, target_interval_time_us: %" G_GINT64_FORMAT, clock_driver, target_interval_time_us);
     }
 
   if (last_target_interval_time_us != -1)
@@ -93,11 +97,15 @@ calculate_tick_start_time_us (ClutterClockDriver *clock_driver,
       {
         target_interval_time_us =
           last_target_interval_time_us + interval_duration_us;
+
+        g_debug ("calculate_tick_start_time_us: %p, step 3, target_interval_time_us: %" G_GINT64_FORMAT, clock_driver, target_interval_time_us);
       }
   }
 
   while (target_interval_time_us < now_us + minimum_tick_duration_us)
     target_interval_time_us += interval_duration_us;
+
+  g_debug ("calculate_tick_start_time_us: %p, step 4, target_interval_time_us: %" G_GINT64_FORMAT, clock_driver, target_interval_time_us);
 
   tick_start_time_us = target_interval_time_us - maximum_tick_duration_us;
 
@@ -129,12 +137,16 @@ clutter_clock_driver_schedule_tick (ClutterClockDriver *clock_driver,
 
   g_warn_if_fail (tick_start_time_us != -1);
 
+  g_debug ("clutter_clock_driver_schedule_tick: %p: dispatching in: %" G_GINT64_FORMAT, clock_driver, tick_start_time_us);
+
   g_source_set_ready_time (clock_driver->source, tick_start_time_us);
 }
 
 void
 clutter_clock_driver_cancel_tick (ClutterClockDriver *clock_driver)
 {
+  g_debug ("clutter_clock_driver_cancel_tick: %p", clock_driver);
+
   g_source_set_ready_time (clock_driver->source, -1);
 }
 
