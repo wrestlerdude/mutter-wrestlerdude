@@ -54,6 +54,12 @@ typedef struct _ClutterFrameListenerIface
                                 gpointer           user_data);
 } ClutterFrameListenerIface;
 
+typedef enum _ClutterFrameClockMode
+{
+  CLUTTER_FRAME_CLOCK_MODE_FIXED,
+  CLUTTER_FRAME_CLOCK_MODE_VARIABLE
+} ClutterFrameClockMode;
+
 CLUTTER_EXPORT
 ClutterFrameClock * clutter_frame_clock_new (float                            refresh_rate,
                                              const ClutterFrameListenerIface *iface,
@@ -61,6 +67,10 @@ ClutterFrameClock * clutter_frame_clock_new (float                            re
 
 CLUTTER_EXPORT
 void clutter_frame_clock_destroy (ClutterFrameClock *frame_clock);
+
+CLUTTER_EXPORT
+void clutter_frame_clock_set_mode (ClutterFrameClock     *frame_clock,
+                                   ClutterFrameClockMode  mode);
 
 CLUTTER_EXPORT
 void clutter_frame_clock_notify_presented (ClutterFrameClock *frame_clock,
