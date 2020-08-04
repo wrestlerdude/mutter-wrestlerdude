@@ -1084,8 +1084,8 @@ meta_window_actor_maybe_request_frame_sync (MetaWindowActor  *window_actor,
   if (!window)
     return;
 
-  if (!meta_window_get_vrr_supported (window))
-    return;
+  //if (!meta_window_get_vrr_supported (window))
+  //  return;
 
   if (!meta_window_should_be_showing (window))
     return;
