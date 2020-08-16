@@ -2610,6 +2610,36 @@ clutter_stage_schedule_update (ClutterStage *stage)
     }
 }
 
+/**
+ * clutter_stage_schedule_actor_update:
+ * @stage: a #ClutterStage actor
+ * @actor: a #ClutterActor which requires an update
+ *
+ * Schedules a redraw of the #ClutterStage at the next optimal timestamp
+ * for the specified actor.
+ */
+void
+clutter_stage_schedule_actor_update (ClutterStage *stage,
+                                     ClutterActor *actor)
+{
+  ClutterStageWindow *stage_window;
+  GList *l;
+
+  if (CLUTTER_ACTOR_IN_DESTRUCTION (stage))
+    return;
+
+  stage_window = _clutter_stage_get_window (stage);
+  if (stage_window == NULL)
+    return;
+
+  for (l = clutter_stage_peek_stage_views (stage); l; l = l->next)
+    {
+      ClutterStageView *view = l->data;
+
+      clutter_stage_view_schedule_actor_update (view, actor);
+    }
+}
+
 ClutterPaintVolume *
 _clutter_stage_paint_volume_stack_allocate (ClutterStage *stage)
 {

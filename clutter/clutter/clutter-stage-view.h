@@ -50,6 +50,9 @@ struct _ClutterStageViewClass
                                        int                          dst_width,
                                        int                          dst_height,
                                        cairo_rectangle_int_t       *dst_rect);
+
+  void (* schedule_actor_update) (ClutterStageView *view,
+                                  ClutterActor     *actor);
 };
 
 CLUTTER_EXPORT

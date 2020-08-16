@@ -65,6 +65,9 @@ void clutter_stage_view_transform_rect_to_onscreen (ClutterStageView            
 
 void clutter_stage_view_schedule_update (ClutterStageView *view);
 
+void clutter_stage_view_schedule_actor_update (ClutterStageView *view,
+                                               ClutterActor     *actor);
+
 void clutter_stage_view_notify_presented (ClutterStageView *view,
                                           ClutterFrameInfo *frame_info);
 

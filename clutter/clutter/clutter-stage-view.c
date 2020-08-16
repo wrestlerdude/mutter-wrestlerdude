@@ -1040,6 +1040,22 @@ clutter_stage_view_schedule_update (ClutterStageView *view)
   clutter_frame_clock_schedule_update (priv->frame_clock);
 }
 
+void
+clutter_stage_view_schedule_actor_update (ClutterStageView *view,
+                                          ClutterActor     *actor)
+{
+  ClutterStageViewClass *view_class = CLUTTER_STAGE_VIEW_GET_CLASS (view);
+
+  view_class->schedule_actor_update (view, actor);
+}
+
+static void
+clutter_stage_view_real_schedule_actor_update (ClutterStageView *view,
+                                               ClutterActor     *actor)
+{
+  clutter_stage_view_schedule_update (view);
+}
+
 float
 clutter_stage_view_get_refresh_rate (ClutterStageView *view)
 {
@@ -1419,6 +1435,8 @@ clutter_stage_view_class_init (ClutterStageViewClass *klass)
   object_class->constructed = clutter_stage_view_constructed;
   object_class->dispose = clutter_stage_view_dispose;
   object_class->finalize = clutter_stage_view_finalize;
+
+  klass->schedule_actor_update = clutter_stage_view_real_schedule_actor_update;
 
   obj_props[PROP_NAME] =
     g_param_spec_string ("name",
