@@ -307,7 +307,8 @@ meta_wayland_actor_surface_apply_state (MetaWaylandSurfaceRole  *surface_role,
       MetaBackend *backend = surface->compositor->backend;
       ClutterActor *stage = meta_backend_get_stage (backend);
 
-      clutter_stage_schedule_update (CLUTTER_STAGE (stage));
+      clutter_stage_schedule_actor_update (CLUTTER_STAGE (stage),
+                                           CLUTTER_ACTOR (priv->actor));
     }
 
   meta_wayland_actor_surface_queue_frame_callbacks (actor_surface, pending);
