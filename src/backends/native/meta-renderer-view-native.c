@@ -26,6 +26,7 @@
 
 #include "clutter/clutter.h"
 #include "backends/meta-output.h"
+#include "backends/native/meta-onscreen-native.h"
 #include "backends/native/meta-renderer-native.h"
 
 struct _MetaRendererViewNative
@@ -39,6 +40,32 @@ struct _MetaRendererViewNative
 
 G_DEFINE_TYPE (MetaRendererViewNative, meta_renderer_view_native,
                META_TYPE_RENDERER_VIEW);
+
+static void
+meta_renderer_view_native_update_vrr_mode (MetaRendererViewNative *view_native,
+                                           gboolean                vrr_requested)
+{
+  MetaRendererView *view = META_RENDERER_VIEW (view_native);
+  MetaOutput *output;
+
+  output = meta_renderer_view_get_output (view);
+
+  if (vrr_requested != meta_output_is_vrr_requested (output))
+    {
+      ClutterStageView *stage_view = CLUTTER_STAGE_VIEW (view);
+
+      meta_output_set_vrr_requested (output, vrr_requested);
+
+      if (meta_output_is_vrr_enabled (output))
+        {
+          CoglFramebuffer *framebuffer =
+            clutter_stage_view_get_onscreen (stage_view);
+          CoglOnscreen *onscreen = COGL_ONSCREEN (framebuffer);
+
+          meta_onscreen_native_queue_modeset (onscreen);
+        }
+    }
+}
 
 static void
 meta_renderer_view_native_update_sync_mode (MetaRendererViewNative *view_native)
@@ -56,6 +83,9 @@ meta_renderer_view_native_update_sync_mode (MetaRendererViewNative *view_native)
     clock_mode = CLUTTER_FRAME_CLOCK_MODE_FIXED;
 
   clutter_frame_clock_set_mode (frame_clock, clock_mode);
+
+  meta_renderer_view_native_update_vrr_mode (view_native,
+                                             sync_requested);
 }
 
 static void
