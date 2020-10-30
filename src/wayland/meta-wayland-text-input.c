@@ -567,9 +567,8 @@ text_input_commit_state (struct wl_client   *client,
         {
           if (!clutter_input_focus_is_focused (focus))
             clutter_input_method_focus_in (input_method, focus);
-          else
-            enable_panel = TRUE;
 
+          enable_panel = TRUE;
           clutter_input_focus_set_can_show_preedit (focus, TRUE);
         }
       else if (clutter_input_focus_is_focused (focus))
